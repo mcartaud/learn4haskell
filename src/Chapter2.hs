@@ -524,14 +524,8 @@ True
 False
 -}
 isThird42 :: [Int] -> Bool
-isThird42 (_ : _ : z : _) = z == 42
+isThird42 (_ : _ : 42 : _) = True
 isThird42 _ = False
-
--- Or
--- isThird42 [_, _, z, _] = z == 42
--- Is there some differences?
-
-
 {- |
 =🛡= Recursion
 
@@ -651,13 +645,13 @@ Write a function that takes elements of a list only on even positions.
 [2,3,4]
 -}
 takeEven :: [a] -> [a]
-takeEven n = go 0 n
+takeEven n = go True n
   where
-    go :: Int -> [a] -> [a]
+    go :: Bool -> [a] -> [a]
     go _ [] = []
     go acc (x : xs)
-      | mod acc 2 == 0 = x : go (acc + 1) xs
-      | otherwise = go (acc + 1) xs
+      | acc = x : go (not acc) xs
+      | otherwise = go (not acc) xs
 
 {- |
 =🛡= Higher-order functions
@@ -764,7 +758,7 @@ value of the element itself
 🕯 HINT: Use combination of 'map' and 'replicate'
 -}
 smartReplicate :: [Int] -> [Int]
-smartReplicate l = concat (map (\x -> replicate x x) l)
+smartReplicate = concatMap (\x -> replicate x x)
 
 {- |
 =⚔️= Task 9
@@ -778,7 +772,7 @@ the list with only those lists that contain a passed element.
 🕯 HINT: Use the 'elem' function to check whether an element belongs to a list
 -}
 contains :: Int -> [[Int]] -> [[Int]]
-contains i l = filter (\x -> elem i x) l
+contains i = filter (\x -> elem i x)
 
 
 {- |
@@ -822,7 +816,7 @@ divideTenBy = div 10
 
 -- TODO: type ;)
 listElementsLessThan :: Int -> [Int] -> [Int]
-listElementsLessThan x l = filter (< x) l
+listElementsLessThan x = filter (< x)
 
 -- Can you eta-reduce this one???
 pairMul :: [Int] -> [Int] -> [Int]
@@ -882,8 +876,9 @@ list.
 🕯 HINT: Use the 'cycle' function
 -}
 rotate :: Int -> [Int] -> [Int]
+rotate _ [] = []
 rotate i xs
-  | i >= 0 = (take (length xs) (drop i (cycle xs)))
+  | i >= 0 = take (length xs) (drop i (cycle xs))
   | otherwise = []
 
 {- |
@@ -903,8 +898,12 @@ and reverses it.
 -- I'm really not sure about this one, on big list it would be very inefficient
 -- but I can't find another solution yet
 rewind :: [Int] -> [Int]
-rewind (x:xs) = rewind xs ++ [x]
 rewind [] = []
+rewind list = go [] list
+  where
+    go :: [Int] -> [Int] -> [Int]
+    go acc [] = acc
+    go acc (x : xs) = go (x : acc) xs
 
 
 {-
